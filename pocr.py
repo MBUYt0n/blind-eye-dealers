@@ -11,7 +11,7 @@ cap = cv2.VideoCapture(0)
 font_path = '/home/shusrith/Downloads/Roboto/Roboto-Regular.ttf'  # Change this to a valid font path
 
 # Set to keep track of already detected texts
-detected_texts = set()
+# detected_texts = set()
 frame_count = 0 
 
 while True:
@@ -31,12 +31,12 @@ while True:
                     for item in line:
                         text = item[1][0]
 
-                        if text not in detected_texts:
-                            print(text)
-                            detected_texts.add(text)
-                            boxes = item[0]
-                            score = item[1][1]
-                            frame = draw_ocr(frame, [boxes], [text], [score], font_path=font_path)
+                        # if text not in detected_texts:
+                        print(text)
+                            # detected_texts.add(text)
+                        boxes = item[0]
+                        score = item[1][1]
+                        frame = draw_ocr(frame, [boxes], [text], [score], font_path=font_path)
                 except:
                     pass
 
