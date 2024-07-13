@@ -7,7 +7,7 @@ import cv2
 from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
 import hashlib
-import WideResNet
+from WideResNet import WideResNet
 
 
 class WrapperClass:
