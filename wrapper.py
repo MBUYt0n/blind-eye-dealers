@@ -9,21 +9,18 @@ import numpy as np
 import hashlib
 import WideResNet
 
+
 class WrapperClass:
     def __init__(self, img_size, depth, k, margin):
         self.img_size = img_size
         self.margin = margin
         self.ag_model = WideResNet(img_size, depth=depth, k=k)()
-        self.ag_model.load_weights(
-            "/kaggle/input/emogen2/tensorflow2/one/1/weights.28-3.73.hdf5"
-        )
-        self.emotion_model = load_model(
-            "/kaggle/input/emogen2/tensorflow2/one/1/emotion_little_vgg_2.h5"
-        )
-        self.yolo = YOLO("/kaggle/input/yolov8/pytorch/open-image-v8/1/yolov8s-oiv7.pt")
+        self.ag_model.load_weights("models/weights.28-3.73.hdf5")
+        self.emotion_model = load_model("models/emotion_little_vgg_2.h5")
+        self.yolo = YOLO("yolov8s-oiv7.pt")
         self.ocr = PaddleOCR(
-            use_angle_cls=True, lang="en"
-        )  # need to run only once to download and load model into memory
+            use_angle_cls=True, lang="en", show_log=False
+        )  
         self.emotion_classes = {
             0: "Angry",
             1: "Disgust",
@@ -129,38 +126,40 @@ class WrapperClass:
         print(detected_text)
         self.prev_frame = frame_hash
 
-    def make_prediction(self, video_path, func):
+    def make_prediction(self, video_path):
         a = time.time()
-        output_video_path = "output.mp4"
+        # output_video_path = "output.mp4"
         cap = cv2.VideoCapture(video_path)
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        fps = int(cap.get(cv2.CAP_PROP_FPS)) // 2
         frame_count = 0
+        print(fps)
 
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
 
-            if frame_count % 30 != 0:
+            if frame_count % (fps) != 0:
                 frame_count += 1
                 continue
-            if frame_count == 600:
-                break
 
             print(frame_count)
-            func(frame)
+            self.ocr_pred(frame)
+            self.vision_pred(frame)
             frame_count += 1
 
         cap.release()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
         b = time.time()
         print(b - a)
 
-    def __call__(self, video_path, func):
-        if func == "see":
-            self.make_prediction(video_path, self.vision_pred)
-        elif func == "ocr":
-            self.make_prediction(video_path, self.ocr_pred)
+    def __call__(
+        self,
+        video_path,
+    ):
+        self.make_prediction(video_path)
+
+
+model = WrapperClass(64, 16, 8, 0.4)
+model("/home/shusrith/vid.mp4")
