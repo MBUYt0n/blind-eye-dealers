@@ -17,7 +17,9 @@ class WrapperClass:
         self.ag_model = WideResNet(img_size, depth=depth, k=k)()
         self.ag_model.load_weights("models/weights.28-3.73.hdf5")
         self.emotion_model = load_model("models/emotion_little_vgg_2.h5")
-        self.yolo = YOLO("yolov8s-oiv7.pt")
+        self.yolo = YOLO(
+            "yolov8n.pt"
+        )
         self.ocr = PaddleOCR(
             use_angle_cls=True, lang="en", show_log=False
         )  
