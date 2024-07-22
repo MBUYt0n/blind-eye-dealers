@@ -6,10 +6,9 @@ import math
 
 logging.getLogger("ultralytics").setLevel(logging.ERROR)
 
-B = 0.751
-F = 550
-W = 540
-FOV = math.radians(80)
+# B = 0.0751
+# W = 540
+# FOV = math.radians(80)
 
 
 def calculate_iou(box1, box2):
@@ -45,23 +44,47 @@ def find_matches(res, res1, iou_threshold=0.1):
 #     c = []
 #     for i in param:
 #         x, _, z, _ = i[1].values()
-#         c.append(abs((x + z) / 2))
-#     dist = (B * W * 2) / (2 * math.tan(FOV / 2) * abs(c[0] - c[1]))
+#         c.append((x + z) / 2)  # Ensure to calculate average correctly
+#     x1, x2 = c[0], c[1]
+#     disparity = abs(x1 - x2)
+#     if disparity == 0:  # Avoid division by zero
+#         return float("inf")
+
+#     dist = (B * W * 2) / (2 * math.tan(FOV / 2) * abs(x1 - x2))
 #     return dist
 
+
 def calc_distance(param):
-    c = []
-    for i in param:
-        x, _, z, _ = i[1].values()
-        c.append(abs(x + z))
-    d = abs(c[0] - c[1])
-    dist = (B * F) / d
+    # Constants
+    B = 0.751  # Baseline distance between the two cameras (in meters)
+    FOV = math.radians(69.4)  # Field of view angle (in radians)
+    image_width = (
+        1080  # Assuming image width in pixels, adjust as per your camera resolution
+    )
+
+    if len(param) != 2:
+        raise ValueError("param should contain exactly two objects")
+
+    # Extract x coordinates from param
+    x1 = param[0][1]["x1"]  # Assuming param[0][1] is a dictionary with 'x' key
+    x2 = param[1][1]["x2"]  # Assuming param[1][1] is a dictionary with 'x' key
+
+    # Calculate the disparity
+    disparity = abs(x1 - x2)
+
+    if disparity == 0:
+        raise ValueError("Disparity is zero, can't calculate distance")
+
+    # Calculate the distance using the baseline (B), image width, and disparity
+    focal_length = image_width / (2 * math.tan(FOV / 2))
+    dist = (B * focal_length) / disparity
+
     return dist
 
 
 yolo = YOLO("yolov8n.pt")
-cap = cv2.VideoCapture("/home/shusrith/vids/l1.mp4")
-cap1 = cv2.VideoCapture("/home/shusrith/vids/r1.mp4")
+cap = cv2.VideoCapture("/home/shusrith/vids/l4.mp4")
+cap1 = cv2.VideoCapture("/home/shusrith/vids/r4.mp4")
 frame_count = 0
 
 while True:
@@ -77,8 +100,8 @@ while True:
     results1 = yolo(frame1)
     res = [(i["name"], i["box"]) for j in results for i in j.summary()]
     res1 = [(i["name"], i["box"]) for j in results1 for i in j.summary()]
-    # print("Res", res)
-    # print("Res1", res1)
+    print("Res", res)
+    print("Res1", res1)
     matches = find_matches(res, res1)
     for match in matches:
         d = calc_distance(match)
@@ -117,9 +140,19 @@ while True:
         )
     cv2.imshow("frame1", frame)
     cv2.imshow("frame2", frame1)
-    if cv2.waitKey(1000) & 0xFF == ord("q"):
+    if cv2.waitKey(5000) & 0xFF == ord("q"):
         break
 
 cap.release()
 cap1.release()
 cv2.destroyAllWindows()
+
+
+# def calc_distance(param):
+#     c = []
+#     for i in param:
+#         x, _, z, _ = i[1].values()
+#         c.append(abs(x + z) / 2)
+#     d = abs(c[0] - c[1])
+#     dist = (B * F) / d
+#     return dist
