@@ -82,7 +82,7 @@ def calc_distance(param):
     return dist
 
 
-yolo = YOLO("yolov8n.pt")
+yolo = YOLO("yolov10x.pt")
 cap = cv2.VideoCapture("/home/shusrith/vids/l4.mp4")
 cap1 = cv2.VideoCapture("/home/shusrith/vids/r4.mp4")
 frame_count = 0
