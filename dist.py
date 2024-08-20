@@ -47,11 +47,10 @@ def movement(prev, curr, frame):
         if i in prev:
             prev = sorted(prev[i], key=lambda x: x["mid"])
             curr = sorted(curr[i], key=lambda x: x["mid"])
-            print(prev)
             for objp, objc in zip(prev, curr):
                 curr_area = objc["area"]
                 prev_area = objp["area"]
-
+                print(curr_area, prev_area)
                 if curr_area < prev_area:
                     label = "Moving Away"
                 else:
