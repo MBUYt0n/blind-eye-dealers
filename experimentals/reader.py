@@ -124,7 +124,7 @@ import numpy as np
 
 
 image_path = (
-    "/home/shusrith/projects/blind-eyes/blind-eye-dealers/image.png"
+    "image.jpg"
 )
 image = cv2.imread(image_path)
 
