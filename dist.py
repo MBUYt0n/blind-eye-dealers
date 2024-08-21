@@ -1,6 +1,7 @@
 import cv2
 from ultralytics import YOLO
 import logging
+import tracemalloc
 
 logging.getLogger("ultralytics").setLevel(logging.ERROR)
 
@@ -56,17 +57,20 @@ def movement(prev, curr, frame):
                 else:
                     label = "Moving Towards"
                 print(i, objc["mid"], label)
-                x1, y1, x2, y2 = (
-                    objc["x1"],
-                    objc["y1"],
-                    objc["x2"],
-                    objc["y2"],
+                cv2.rectangle(
+                    frame,
+                    (
+                        objc["x1"],
+                        objc["y1"],
+                    ),
+                    (objc["x2"], objc["y2"]),
+                    (0, 255, 0),
+                    2,
                 )
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(
                     frame,
                     label,
-                    (x1, y1 - 10),
+                    (objc["x1"], objc["y1"] - 10),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.9,
                     (0, 255, 0),
@@ -74,19 +78,18 @@ def movement(prev, curr, frame):
                 )
 
 
+# Start tracing memory allocations
+# tracemalloc.start()
+
 yolo = YOLO("yolov10x.pt")
 cap = cv2.VideoCapture("/home/shusrith/vids/l4.mp4")
-frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-out = cv2.VideoWriter(
-    "output.avi",
-    cv2.VideoWriter_fourcc("M", "J", "P", "G"),
-    10,
-    (frame_width, frame_height),
-)
 
 frame_count = 0
 prev, curr = {}, {}
+
+# # Take a snapshot before processing
+# snapshot1 = tracemalloc.take_snapshot()
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -101,9 +104,27 @@ while True:
     curr = org(res)
     if prev is not None:
         movement(prev, curr, frame)
+    cv2.imshow("frame", frame)
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
 
-    out.write(frame)
+# Take a snapshot after processing
+# snapshot2 = tracemalloc.take_snapshot()
 
 cap.release()
-out.release()
 cv2.destroyAllWindows()
+
+# # Compare snapshots
+# top_stats = snapshot2.compare_to(snapshot1, "lineno")
+
+# print("[ Top 10 differences ]")
+# for stat in top_stats[:10]:
+#     print(stat)
+
+# # Get current and peak memory usage
+# current, peak = tracemalloc.get_traced_memory()
+# print(f"Current memory usage: {current / 1024 / 1024:.2f} MiB")
+# print(f"Peak memory usage: {peak / 1024 / 1024:.2f} MiB")
+
+# # Stop tracing memory allocations
+# tracemalloc.stop()
