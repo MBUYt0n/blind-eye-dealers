@@ -80,8 +80,8 @@ def movement(prev, curr, frame):
 # Start tracing memory allocations
 # tracemalloc.start()
 
-yolo = YOLO("yolov10x.pt")
-cap = cv2.VideoCapture("/home/shusrith/vids/l4.mp4")
+yolo = YOLO("yolov8n.pt")
+cap = cv2.VideoCapture(r"C:\Users\swath\Downloads\blind-eyes\vids\l1.mp4")
 
 frame_count = 0
 prev, curr = {}, {}
@@ -104,7 +104,7 @@ while True:
     if prev is not None:
         movement(prev, curr, frame)
     cv2.imshow("frame", frame)
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+    if cv2.waitKey(1500) & 0xFF == ord("q"):
         break
 
 # Take a snapshot after processing
