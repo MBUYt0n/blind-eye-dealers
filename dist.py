@@ -1,7 +1,6 @@
 import cv2
 from ultralytics import YOLO
 import logging
-import tracemalloc
 
 logging.getLogger("ultralytics").setLevel(logging.ERROR)
 
