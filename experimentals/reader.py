@@ -150,5 +150,5 @@ if middle_x != -1:
     cv2.imwrite("left_page.jpg", left_page)
     cv2.imwrite("right_page.jpg", right_page)
 
-cv2.imshow("thresh", thresh)
+cv2.imshow("thresh", left_page)
 cv2.waitKey(0)
