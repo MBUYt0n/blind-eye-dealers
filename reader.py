@@ -72,3 +72,6 @@ while True:
 # print("\nOther Texts:")
 # for text in other_texts:
 #     print(text)
+# print("\nOther Texts:")
+# for text in other_texts:
+#     print(text)
