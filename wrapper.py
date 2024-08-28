@@ -164,4 +164,4 @@ class WrapperClass:
 
 
 model = WrapperClass(64, 16, 8, 0.4)
-model("/home/shusrith/vid.mp4")
+model("/home/shusrith/vids/l1.mp4")

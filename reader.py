@@ -3,7 +3,7 @@ from paddleocr import PaddleOCR
 
 ocr = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
 
-image_path = "image.jpg"
+image_path = "/home/shusrith/vids/book.jpg"
 image = cv2.imread(image_path)
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -16,7 +16,7 @@ def is_headline(bbox):
     y_min = min(y1[1], y2[1], y3[1], y4[1])
     y_max = max(y1[1], y2[1], y3[1], y4[1])
     height = y_max - y_min
-    return height > 50
+    return height > 20
 
 
 headlines = []
@@ -33,6 +33,6 @@ print("Headlines:")
 for headline in headlines:
     print(headline)
 
-print("\nOther Texts:")
-for text in other_texts:
-    print(text)
+# print("\nOther Texts:")
+# for text in other_texts:
+#     print(text)
