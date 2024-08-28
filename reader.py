@@ -45,33 +45,3 @@ while True:
         cv2.imshow("frame", frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
-
-
-# def headline(bbox):
-#     y1, y2, y3, y4 = bbox
-#     y_min = min(y1[1], y2[1], y3[1], y4[1])
-#     y_max = max(y1[1], y2[1], y3[1], y4[1])
-#     height = y_max - y_min
-#     return height
-
-
-# headlines = []
-# other_texts = []
-
-# for line in result[0]:
-#     bbox, text = line
-#     if is_headline(bbox):
-#         headlines.append(text)
-#     else:
-#         other_texts.append(text)
-
-# print("Headlines:")
-# for headline in headlines:
-#     print(headline)
-
-# print("\nOther Texts:")
-# for text in other_texts:
-#     print(text)
-# print("\nOther Texts:")
-# for text in other_texts:
-#     print(text)
