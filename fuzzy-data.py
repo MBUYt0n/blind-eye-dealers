@@ -1,3 +1,4 @@
+import json
 import cv2
 from ultralytics import YOLO
 import logging
@@ -22,6 +23,7 @@ def org(res):
         area = (x2 - x1) * (y2 - y1)
         curr[i[0]].append(
             {
+                "text": None,
                 "mid": mid,
                 "area": area,
                 "x1": x1,
@@ -53,9 +55,24 @@ def reader(frame):
     text = ""
     if result[0] is not None:
         for i in result[0]:
-            _, t = i
+            coords, t = i
             text += " " + t[0]
-    return text
+            x = list(map(lambda x: int(x[0]), coords))
+            y = list(map(lambda x: int(x[1]), coords))
+            x1, x2, y1, y2 = min(x), max(x), min(y), max(y)
+            area = (x2 - x1) * (y2 - y1)
+            mid = ((x1 + x2) / 2) + ((y1 + y2) / 2) * 1080
+
+    return {
+        "text": text,
+        "mid": mid,
+        "area": area,
+        "x1": x1,
+        "y1": y1,
+        "x2": x2,
+        "y2": y2,
+        "dir": None,
+    }
 
 
 yolo = YOLO("yolov8n.pt")
@@ -66,23 +83,28 @@ cap = cv2.VideoCapture("/home/shusrith/vids/l1.mp4")
 frame_count = 0
 prev, curr = {}, {}
 
+l = []
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
     frame_count += 1
-    if frame_count % 15 != 0:
+    if frame_count % 60 != 0:
         continue
-    text = reader(frame)
     results = yolo(frame)
     res = [(i["name"], i["box"]) for j in results for i in j.summary()]
     prev = curr
     curr = org(res)
+    curr["ocr"] = reader(frame)
     if prev is not None:
-        movement(prev, curr, frame)
+        movement(prev, curr)
+    l.append(curr)
+    print(frame_count)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
+with open("data.json", "w") as f:
+    json.dump(l, f)
 cap.release()
 cv2.destroyAllWindows()
