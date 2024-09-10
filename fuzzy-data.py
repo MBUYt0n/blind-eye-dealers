@@ -63,16 +63,17 @@ def reader(frame):
             area = (x2 - x1) * (y2 - y1)
             mid = ((x1 + x2) / 2) + ((y1 + y2) / 2) * 1080
 
-    return {
-        "text": text,
-        "mid": mid,
-        "area": area,
-        "x1": x1,
-        "y1": y1,
-        "x2": x2,
-        "y2": y2,
-        "dir": None,
-    }
+        return {
+            "text": text,
+            "mid": mid,
+            "area": area,
+            "x1": x1,
+            "y1": y1,
+            "x2": x2,
+            "y2": y2,
+            "dir": None,
+        }
+    return None
 
 
 yolo = YOLO("yolov8n.pt")
@@ -96,9 +97,11 @@ while True:
     res = [(i["name"], i["box"]) for j in results for i in j.summary()]
     prev = curr
     curr = org(res)
-    curr["ocr"] = reader(frame)
     if prev is not None:
         movement(prev, curr)
+    a = reader(frame)
+    if a is not None:
+        curr["ocr"] = a
     l.append(curr)
     print(frame_count)
     if cv2.waitKey(1) & 0xFF == ord("q"):
