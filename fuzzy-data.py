@@ -93,6 +93,7 @@ while True:
     frame_count += 1
     if frame_count % 60 != 0:
         continue
+    l.append({frame_count: []})
     results = yolo(frame)
     res = [(i["name"], i["box"]) for j in results for i in j.summary()]
     prev = curr
@@ -102,7 +103,7 @@ while True:
     a = reader(frame)
     if a is not None:
         curr["ocr"] = a
-    l.append(curr)
+    l[-1][frame_count] = curr
     print(frame_count)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
